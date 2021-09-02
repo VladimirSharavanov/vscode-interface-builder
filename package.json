@@ -3,6 +3,7 @@
 	"displayName": "Interface builder",
 	"description": "Defines interface of object",
 	"version": "0.0.1",
+	"publisher": "VladimirSharavanov",
 	"engines": {
 		"vscode": "^1.59.0"
 	},
