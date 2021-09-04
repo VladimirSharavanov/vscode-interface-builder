@@ -1,0 +1,26 @@
+import * as vscode from 'vscode';
+import { InterfaceBuilder } from './interface-builder';
+
+export function activate(context: vscode.ExtensionContext) {
+	const disposable = vscode.commands.registerCommand(
+		'interface-builder.getInterface',
+		() => {
+			const activeTextEditor = vscode.window.activeTextEditor;
+			if (activeTextEditor) {
+				const textFile = activeTextEditor.document.getText(activeTextEditor.selection);
+				const location = activeTextEditor.document.positionAt(0);
+
+				vscode.window.activeTextEditor?.edit((editBuilder) => {
+					try {
+						editBuilder.insert(location, new InterfaceBuilder().getInterface(textFile));
+					} catch (error) {
+						vscode.window.showErrorMessage('Selected text is not a valid object');
+					}
+				});
+			}
+		});
+
+	context.subscriptions.push(disposable);
+}
+
+export function deactivate() { }
