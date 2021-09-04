@@ -36,7 +36,7 @@
 			{
 				"command": "interface-builder.getInterface",
 				"key": "ctrl+alt+i",
-				"mac": "cmd+alt+.i"
+				"mac": "cmd+alt+i"
 			}
 		]
 	},
