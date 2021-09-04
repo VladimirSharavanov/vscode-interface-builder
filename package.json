@@ -4,6 +4,7 @@
 	"description": "Defines interface of object",
 	"version": "0.0.1",
 	"publisher": "VladimirSharavanov",
+	"icon": "images/logo.png",
 	"engines": {
 		"vscode": "^1.59.0"
 	},

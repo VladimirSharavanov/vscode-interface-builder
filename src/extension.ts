@@ -1,6 +1,10 @@
 import * as vscode from 'vscode';
 import { InterfaceBuilder } from './interface-builder';
 
+/**
+ * @param {vscode.ExtensionContext} context
+ */
+
 export function activate(context: vscode.ExtensionContext) {
 	const disposable = vscode.commands.registerCommand(
 		'interface-builder.getInterface',
