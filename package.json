@@ -1,6 +1,6 @@
 {
 	"name": "interface-builder",
-	"displayName": "Interface builder",
+	"displayName": "Interface builder for Typescript",
 	"description": "Defines interface of object",
 	"version": "0.0.1",
 	"publisher": "VladimirSharavanov",

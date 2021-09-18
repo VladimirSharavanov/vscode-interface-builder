@@ -1,9 +1,9 @@
-import { FlatModel, Model } from "./interface-builder.types";
+import { FlatModel } from "./interface-builder.types";
 import { Parser } from "./parser";
 import { TypeChecker } from "./type-checker";
 
 export class InterfaceBuilder {
-  public getInterface(model: Model | string): string {
+  public getInterface(model: string): string {
     const flatModel = new Parser().deconstructToFlatModel(model);
     const typeModelValue = this.checkTypeModelValue(flatModel);
     const correctModel = this.preparationCorrectModel(typeModelValue);
