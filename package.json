@@ -2,7 +2,7 @@
 	"name": "interface-builder",
 	"displayName": "Interface builder for Typescript",
 	"description": "Defines interface of object",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"publisher": "VladimirSharavanov",
 	"icon": "images/logo.png",
 	"engines": {
