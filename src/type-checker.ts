@@ -11,12 +11,17 @@ export class TypeChecker {
     return value && typeof value !== 'object';
   }
 
+  static isNull(value: any | null): boolean {
+    return value === null;
+  }
+
   static isTheSameType(valueA: any, valueB: any): boolean {
     return typeof valueA === typeof valueB;
   }
 
   static checkType(value: any): string {
-    let outputModel: string = typeof value;
+    let outputModel: string = TypeChecker.isNull(value) ? 'null' : typeof value;
+
     if (TypeChecker.isArray(value)) {
       outputModel = TypeChecker.checkArrayStructureType(value);
     }

@@ -76,4 +76,6 @@ const testData: Record<string, string> = {
   t34: `{interface: 'builder', version: 'builder'};`,
   t35: `{interface: 'builder', version: 'builder',};`,
   t36: `{interface: 'builder', version: 'builder',aaa: {bbb: 'builderbuilder',}};`,
+
+  t37: `{interface: null, version: null,aaa: {bbb: null}};`,
 };
