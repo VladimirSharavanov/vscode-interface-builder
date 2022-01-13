@@ -85,7 +85,6 @@ export class Parser {
 
   private fixesQuotes(stringModel: string): string {
     const singleCommaPattern = /['`]/g;
-    const doubleCommaPattern = /["]/g;
     const commaPattern = /["`]/g;
     const commaList: string[] = [];
 
@@ -102,7 +101,14 @@ export class Parser {
       const isSingleComma = char.match(singleCommaPattern);
 
       if (isSingleComma && prevChar !== '\\') {
-        if (!commaList.length && prevChar === ':' || !commaList.length && nextChar === ',' || !commaList.length && nextChar === '}') {
+        if (!commaList.length && prevChar === ':'
+          || !commaList.length && prevChar === ','
+          || !commaList.length && nextChar === ':'
+          || !commaList.length && nextChar === ','
+          || !commaList.length && nextChar === '}'
+          || !commaList.length && prevChar === '['
+          || !commaList.length && nextChar === ']'
+        ) {
           char = '"';
         } else {
           commaList[lastChar] === char ? commaList.pop() : commaList.push(char);

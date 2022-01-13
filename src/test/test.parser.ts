@@ -1,4 +1,4 @@
-const testData: Record<string, string> = {
+export const testData: Record<string, string> = {
   t01: `const x = {interface: 'builder', version: 1},`,
   t02: `let x = {interface: 'builder', version: 1,};`,
   t03: `{interface: 'builder', version: 1,},`,
@@ -76,6 +76,23 @@ const testData: Record<string, string> = {
   t34: `{interface: 'builder', version: 'builder'};`,
   t35: `{interface: 'builder', version: 'builder',};`,
   t36: `{interface: 'builder', version: 'builder',aaa: {bbb: 'builderbuilder',}};`,
-
   t37: `{interface: null, version: null,aaa: {bbb: null}};`,
+  t38: `const x = [{name: 'IB'}, {name: 123456}]`,
+  t39: `const x = {
+          interface: 'builder',
+          adress: {
+            city: null,
+            phone: [123456, '32432'],
+            aaa: [
+              { interface: 'builder' },
+              { interface: 'builder', age: 23 }
+            ]
+          }
+        }`,
+  t40: `const x = {
+    interface: ['builder', 123456, true]
+  }`,
+  t41: `const x = {
+    interface: ['builder', "builder"]
+  }`
 };
