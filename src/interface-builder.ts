@@ -3,11 +3,17 @@ import { Parser } from "./parser";
 import { TypeChecker } from "./type-checker";
 
 export class InterfaceBuilder {
-  public getInterface(model: string): string {
+  constructor(private runType: string) { }
+
+  public getInterface(model: string): string | FlatModel[] {
     const flatModel = new Parser().deconstructToFlatModel(model);
     const typeModelValue = this.checkTypeModelValue(flatModel);
     const correctModel = this.preparationCorrectModel(typeModelValue);
     const render = this.renderInterface(correctModel);
+
+    if (this.runType === 'test') {
+      return correctModel;
+    }
 
     return render;
   }

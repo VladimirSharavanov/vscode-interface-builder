@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 				vscode.window.activeTextEditor?.edit((editBuilder) => {
 					try {
-						editBuilder.insert(location, new InterfaceBuilder().getInterface(textFile));
+						editBuilder.insert(location, (new InterfaceBuilder('').getInterface(textFile) as string));
 					} catch (error) {
 						vscode.window.showErrorMessage('Selected text is not a valid object');
 					}
