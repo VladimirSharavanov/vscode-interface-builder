@@ -1,4 +1,5 @@
 # 0.0.4
+Add union type
 Fix false error message about not a valid JSON object
 Fix definition quotes in string array
 # 0.0.3

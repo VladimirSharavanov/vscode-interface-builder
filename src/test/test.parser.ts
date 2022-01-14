@@ -1,19 +1,3 @@
-export interface InterfaceBuilder {
-  interface: string;
-  adress: Adress;
-}
-
-export interface Adress {
-  city: null;
-  phone: any[];
-  aaa: Aaa[];
-}
-
-export interface Aaa {
-  interface: string;
-  age?: number;
-}
-
 export const testData: Record<string, string> = {
   t01: `const x = {interface: 'builder', version: 1},`,
   t02: `let x = {interface: 'builder', version: 1,};`,
@@ -110,5 +94,16 @@ export const testData: Record<string, string> = {
   }`,
   t41: `const x = {
     interface: ['builder', "builder"]
-  }`
+  }`,
+  t42: `const x = {
+          interface: [
+            { interface: '10', version: 0 },
+            { interface: 10, version: '0.0.0' },
+          ]
+        }`,
+  t43: `
+        const x = {
+          interface: ['builder', 123465, true, null, {name: 'builder'}]
+        }
+  `,
 };
