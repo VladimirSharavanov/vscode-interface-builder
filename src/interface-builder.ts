@@ -72,11 +72,33 @@ export class InterfaceBuilder {
     };
     const keysList: string[][] = [];
     theSamePartList.forEach(part => {
+      combinePart.interfaceName = part.interfaceName;
       keysList.push(Object.keys(part.interfaceValue));
-      Object.assign(combinePart, { interfaceName: part.interfaceName, interfaceValue: Object.assign(combinePart.interfaceValue, part.interfaceValue) });
+
+      for (const key in part.interfaceValue) {
+        if (Object.prototype.hasOwnProperty.call(part.interfaceValue, key)) {
+          const value = part.interfaceValue[key];
+          if (combinePart.interfaceValue[key]) {
+            combinePart.interfaceValue[key] += this.defineUnionTypes(combinePart.interfaceValue[key], value);
+          } else {
+            combinePart.interfaceValue[key] = value;
+          }
+        }
+      }
     });
 
     return this.checkOptionalField(keysList, combinePart);
+  }
+
+  private defineUnionTypes(existingValue: string, newValue: string): string | void {
+    const stringPattern = new RegExp(newValue, 'gi');
+    const checkTheSameType = stringPattern.test(existingValue);
+
+    if (!checkTheSameType) {
+      return ` | ${newValue}`;
+    }
+
+    return '';
   }
 
   private checkOptionalField(keysList: string[][], part: FlatModel): FlatModel {
