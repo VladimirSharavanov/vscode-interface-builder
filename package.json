@@ -1,5 +1,5 @@
 {
-	"name": "interface-builder",
+	"name": "vscode-interface-builder",
 	"displayName": "Interface builder for Typescript",
 	"description": "Defines interface of object",
 	"version": "0.0.4",
@@ -17,10 +17,10 @@
 		"interface",
 		"typescript"
 	],
-	"homepage": "https://github.com/VladimirSharavanov/interface-builder-extension/blob/master/README.md",
+	"homepage": "https://github.com/VladimirSharavanov/vscode-interface-builder/blob/master/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/VladimirSharavanov/interface-builder-extension"
+		"url": "https://github.com/VladimirSharavanov/vscode-interface-builder"
 	},
 	"activationEvents": [
 		"onCommand:interface-builder.getInterface"
