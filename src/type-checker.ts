@@ -43,7 +43,7 @@ export class TypeChecker {
   }
 
   private static primitiveStructure(model: any[]): string {
-    let outputModel = (typeof model[0]).toString();
+    let outputModel = typeof model[0] !== 'undefined' ? typeof model[0] : 'unknown';
     for (const i of model) {
       if (!TypeChecker.isTheSameType(model[0], i)) {
         outputModel = 'any';

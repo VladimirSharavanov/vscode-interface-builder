@@ -1,3 +1,6 @@
+import { InterfaceBuilder } from "../interface-builder";
+import { Parser } from "../parser";
+
 export const testData: Record<string, string> = {
   t01: `const x = {interface: 'builder', version: 1},`,
   t02: `let x = {interface: 'builder', version: 1,};`,
@@ -106,4 +109,33 @@ export const testData: Record<string, string> = {
           interface: ['builder', 123465, true, null, {name: 'builder'}]
         }
   `,
+  t44: `const x = {
+    interface: [1, 2, 3, 4, 5]
+  }`,
+  t50: `
+      {
+        user: {
+          interface: []
+        }
+      }
+  `,
+  t51: `
+      {
+        user: {
+          interface: [['string'], [1234]]
+        }
+      }
+  `,
+  t52: `
+      {
+        user: {
+          interface: [[324234], [1234]]
+        }
+      }
+  `,
 };
+
+for (const key in testData) {
+  const x = new InterfaceBuilder('test').getInterface(testData[key]);
+  console.log(`${key}`, x);
+}
