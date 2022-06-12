@@ -2,7 +2,7 @@
 	"name": "vscode-interface-builder",
 	"displayName": "Interface builder for Typescript",
 	"description": "Defines interface of object",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"publisher": "VladimirSharavanov",
 	"icon": "images/logo.png",
 	"engines": {
