@@ -7,16 +7,14 @@ export class TypeChecker {
     return model instanceof Array;
   }
 
-  static isPrimitive(value: any): boolean {
-    return value && typeof value !== 'object';
-  }
-
   static isNull(value: any | null): boolean {
     return value === null;
   }
 
   static isTheSameType(valueA: any, valueB: any): boolean {
-    return typeof valueA === typeof valueB;
+    return typeof valueA === typeof valueB
+      && this.isNull(valueA) === this.isNull(valueB)
+      && this.isArray(valueA) === this.isArray(valueB);
   }
 
   static checkType(value: any): string {

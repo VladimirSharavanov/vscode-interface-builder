@@ -4,30 +4,29 @@ import { TypeChecker } from "./type-checker";
 export class Parser {
   private flatModelList: FlatModel[] = [];
 
-  public deconstructToFlatModel(model: string): FlatModel[] {
-    let deconstructModel: Model;
-    deconstructModel = { interfaceBuilder: this.stringModelToObjectModel(model) };
-    this.deconstruct(deconstructModel, 'interfaceBuilder');
-
+  public getFlatModel(stringModel: string): FlatModel[] {
+    let objectModel = { interfaceBuilder: this.parseToObjectModel(stringModel) };
+    this.deconstruct(objectModel, 'interfaceBuilder');
+    
     return this.flatModelList;
   }
 
   private deconstruct(model: Model, parentName: string) {
     for (const key in model) {
-      const interfaceName = { interfaceName: !isNaN(Number(key)) ? parentName : key };
+      const interfaceName = { name: !isNaN(Number(key)) ? parentName : key };      
       const value = model[key];
       const typeList = ['object', 'object[]'];
 
       if (typeList.includes(TypeChecker.checkType(value))) {
         if (!TypeChecker.isArray(value)) {
-          this.flatModelList.push({ ...interfaceName, interfaceValue: value });
+          this.flatModelList.push({ ...interfaceName, value });
         }
         this.deconstruct(value, key);
       }
     }
   }
 
-  private stringModelToObjectModel(stringModel: string): Model {
+  private parseToObjectModel(stringModel: string): Model {
     stringModel = this.removeSpaces(stringModel);
     stringModel = this.removeSuperfluousSubstring(stringModel);
     stringModel = this.removeCommaBeforeBracket(stringModel);

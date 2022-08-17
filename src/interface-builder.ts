@@ -3,33 +3,29 @@ import { Parser } from "./parser";
 import { TypeChecker } from "./type-checker";
 
 export class InterfaceBuilder {
-  constructor(private runType: string) { }
+  constructor() { }
 
-  public getInterface(model: string): string | FlatModel[] {
-    const flatModel = new Parser().deconstructToFlatModel(model);
+  public getInterface(selectedText: string): FlatModel[] | string {
+    const flatModel = new Parser().getFlatModel(selectedText);
     const typeModelValue = this.checkTypeModelValue(flatModel);
     const correctModel = this.preparationCorrectModel(typeModelValue);
-    const render = this.renderInterface(correctModel);
+    const result = this.renderInterface(correctModel);
 
-    if (this.runType === 'test') {
-      return correctModel;
-    }
-
-    return render;
+    return result;
   }
 
   private checkTypeModelValue(model: FlatModel[]): FlatModel[] {
     return model.map((part: FlatModel) => {
       const typeModelValue: Record<string, string> = {};
 
-      for (const key in part.interfaceValue) {
-        const type = TypeChecker.checkType(part.interfaceValue[key]);
+      for (const key in part.value) {
+        const type = TypeChecker.checkType(part.value[key]);
         typeModelValue[key] = this.substitutionInterfaceName(key, type);
       }
 
       return {
-        interfaceName: this.substitutionInterfaceName(part.interfaceName),
-        interfaceValue: typeModelValue,
+        name: this.substitutionInterfaceName(part.name),
+        value: typeModelValue,
       };
     });
   }
@@ -49,8 +45,8 @@ export class InterfaceBuilder {
   private preparationCorrectModel(model: FlatModel[]): FlatModel[] {
     const preparationPartNameList: string[] = [];
     const correctModel = model.map(part => {
-      if (!preparationPartNameList.includes(part.interfaceName)) {
-        preparationPartNameList.push(part.interfaceName);
+      if (!preparationPartNameList.includes(part.name)) {
+        preparationPartNameList.push(part.name);
         return this.checkTheSamePart(model, part);
       }
     }).filter(part => part !== undefined);
@@ -59,7 +55,7 @@ export class InterfaceBuilder {
   }
 
   private checkTheSamePart(model: FlatModel[], part: FlatModel): FlatModel {
-    const theSamePartList = model.filter(currentPart => currentPart.interfaceName === part.interfaceName);
+    const theSamePartList = model.filter(currentPart => currentPart.name === part.name);
     if (theSamePartList.length < 2) { return part; }
 
     return this.combineTheSameParts(theSamePartList);
@@ -67,21 +63,21 @@ export class InterfaceBuilder {
 
   private combineTheSameParts(theSamePartList: FlatModel[]): FlatModel {
     const combinePart: FlatModel = {
-      interfaceName: '',
-      interfaceValue: {}
+      name: '',
+      value: {}
     };
     const keysList: string[][] = [];
     theSamePartList.forEach(part => {
-      combinePart.interfaceName = part.interfaceName;
-      keysList.push(Object.keys(part.interfaceValue));
+      combinePart.name = part.name;
+      keysList.push(Object.keys(part.value));
 
-      for (const key in part.interfaceValue) {
-        if (Object.prototype.hasOwnProperty.call(part.interfaceValue, key)) {
-          const value = part.interfaceValue[key];
-          if (combinePart.interfaceValue[key]) {
-            combinePart.interfaceValue[key] += this.defineUnionTypes(combinePart.interfaceValue[key], value);
+      for (const key in part.value) {
+        if (Object.prototype.hasOwnProperty.call(part.value, key)) {
+          const value = part.value[key];
+          if (combinePart.value[key]) {
+            combinePart.value[key] += this.defineUnionTypes(combinePart.value[key], value);
           } else {
-            combinePart.interfaceValue[key] = value;
+            combinePart.value[key] = value;
           }
         }
       }
@@ -91,37 +87,31 @@ export class InterfaceBuilder {
   }
 
   private defineUnionTypes(existingValue: string, newValue: string): string | void {
-    const stringPattern = new RegExp(newValue, 'gi');
-    const checkTheSameType = stringPattern.test(existingValue);
-
-    if (!checkTheSameType) {
-      return ` | ${newValue}`;
-    }
-
-    return '';
+    let typeList = existingValue.split(' | ');
+    return (typeList.includes(newValue)) ? '' : ` | ${newValue}`;
   }
 
   private checkOptionalField(keysList: string[][], part: FlatModel): FlatModel {
     const fullPartWithOptionalFields: FlatModel = {
-      interfaceName: '',
-      interfaceValue: {}
+      name: '',
+      value: {}
     };
     const keysToDelete: string[] = [];
     keysList.forEach(keys => {
-      for (const key in part.interfaceValue) {
+      for (const key in part.value) {
         if (keys.includes(key)) {
-          fullPartWithOptionalFields.interfaceValue[key] = part.interfaceValue[key];
+          fullPartWithOptionalFields.value[key] = part.value[key];
         } else {
-          fullPartWithOptionalFields.interfaceValue[`${key}?`] = part.interfaceValue[key];
+          fullPartWithOptionalFields.value[`${key}?`] = part.value[key];
           keysToDelete.push(key);
         }
       }
-      fullPartWithOptionalFields.interfaceName = part.interfaceName;
+      fullPartWithOptionalFields.name = part.name;
     });
 
-    for (const key in fullPartWithOptionalFields.interfaceValue) {
+    for (const key in fullPartWithOptionalFields.value) {
       if (keysToDelete.includes(key)) {
-        delete fullPartWithOptionalFields.interfaceValue[key];
+        delete fullPartWithOptionalFields.value[key];
       }
     }
 
@@ -134,12 +124,12 @@ export class InterfaceBuilder {
     const renderContent: string[] = [];
     const renderFooter: string[] = [];
 
-    modelList.forEach((part: any) => {
+    modelList.forEach((part: FlatModel) => {
       let fieldList = '';
-      const { interfaceName, interfaceValue } = part;
-      renderHeader.push(`export interface ${part.interfaceName} {\n`);
-      for (const key in interfaceValue) {
-        fieldList += (`\t${key}: ${interfaceValue[key]};\n`);
+      const { name, value } = part;
+      renderHeader.push(`export interface ${part.name} {\n`);
+      for (const key in value) {
+        fieldList += (`\t${key}: ${value[key]};\n`);
       };
       renderContent.push(fieldList);
       renderFooter.push('}\n\n');

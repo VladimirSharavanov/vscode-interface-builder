@@ -1,3 +1,5 @@
+# 0.0.6
+Fix union type
 # 0.0.5
 Сhange undefined type to unknown type
 # 0.0.4
