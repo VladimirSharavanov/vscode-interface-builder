@@ -5,3 +5,5 @@ export interface FlatModel {
   name: string;
   value: Model;
 }
+
+export type OptionKeys = 'addabove' | 'replace' | 'newfile';

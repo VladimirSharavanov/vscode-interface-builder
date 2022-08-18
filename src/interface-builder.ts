@@ -3,9 +3,7 @@ import { Parser } from "./parser";
 import { TypeChecker } from "./type-checker";
 
 export class InterfaceBuilder {
-  constructor() { }
-
-  public getInterface(selectedText: string): FlatModel[] | string {
+  public getInterface(selectedText: string): string {
     const flatModel = new Parser().getFlatModel(selectedText);
     const typeModelValue = this.checkTypeModelValue(flatModel);
     const correctModel = this.preparationCorrectModel(typeModelValue);

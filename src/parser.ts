@@ -1,3 +1,4 @@
+import { Config } from "./config";
 import { FlatModel, Model } from "./interface-builder.types";
 import { TypeChecker } from "./type-checker";
 
@@ -5,8 +6,11 @@ export class Parser {
   private flatModelList: FlatModel[] = [];
 
   public getFlatModel(stringModel: string): FlatModel[] {
-    let objectModel = { interfaceBuilder: this.parseToObjectModel(stringModel) };
-    this.deconstruct(objectModel, 'interfaceBuilder');
+    const config = new Config();
+    const name = config.getInterfaceName();
+
+    const objectModel = { [name]: this.parseToObjectModel(stringModel) };
+    this.deconstruct(objectModel, name);
     
     return this.flatModelList;
   }

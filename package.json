@@ -39,7 +39,27 @@
 				"key": "ctrl+alt+i",
 				"mac": "cmd+alt+i"
 			}
-		]
+		],
+		"configuration": {
+			"title": "Interface builder for Typescript",
+			"properties": {
+				"interface-builder.interfaceName": {
+					"type": "string",
+					"default": "InterfaceBuilder",
+					"description": "Change interface name (Default InterfaceBuilder)"
+				},
+				"interface-builder.destination": {
+					"type": "string",
+					"enum": [
+						"add-above",
+						"replace",
+						"new-file"
+					],
+					"default": "add-above",
+					"description": "Destination option for created interface"
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",
