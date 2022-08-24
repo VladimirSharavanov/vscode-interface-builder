@@ -64,7 +64,7 @@ export class Extension {
         const selectedText = activeTextEditor.document.getText(activeTextEditor.selection);
 
         try {
-          vscode.window.showInputBox({ title: 'Enter valid interface name.', placeHolder: 'Default: InterfaceBuilder' }).then(value => {
+          vscode.window.showInputBox({ title: 'Enter valid interface name.' }).then(value => {
             const interfaceName = this.config.getInterfaceName(value);
             const ib = new InterfaceBuilder();
             const interfaceTS = ib.getInterface(selectedText, interfaceName);
