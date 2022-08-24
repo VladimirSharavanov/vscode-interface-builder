@@ -2,7 +2,7 @@
 	"name": "interface-builder",
 	"displayName": "Interface builder for Typescript",
 	"description": "Defines interface of object",
-	"version": "0.0.6",
+	"version": "1.0.0",
 	"publisher": "VladimirSharavanov",
 	"icon": "images/logo.png",
 	"engines": {
@@ -23,43 +23,57 @@
 		"url": "https://github.com/VladimirSharavanov/vscode-interface-builder"
 	},
 	"activationEvents": [
-		"onCommand:interface-builder.getInterface"
+		"onCommand:interface-builder.insertInterface",
+		"onCommand:interface-builder.replaceInterface",
+		"onCommand:interface-builder.exportInterface"
 	],
-	"main": "./dist/extension.js",
+	"main": "./dist/index.js",
 	"contributes": {
+		"configuration": {
+			"properties": {
+				"interface-builder.defaultInterfaceName": {
+					"type": "string",
+					"default": "InterfaceBuilder",
+					"description": "Follow the TS syntax rules. Default: InterfaceBuilder"
+				},
+				"interface-builder.postfix": {
+					"type": "string",
+					"default": ".type",
+					"description": "Enter postfix for export file. Example: app.type.ts"
+				}
+			}
+		},
 		"commands": [
 			{
-				"command": "interface-builder.getInterface",
-				"title": "Create interface"
+				"command": "interface-builder.exportInterface",
+				"title": "Export interface"
+			},
+			{
+				"command": "interface-builder.insertInterface",
+				"title": "Insert interface"
+			},
+			{
+				"command": "interface-builder.replaceInterface",
+				"title": "Replace by interface"
 			}
 		],
 		"keybindings": [
 			{
-				"command": "interface-builder.getInterface",
+				"command": "interface-builder.exportInterface",
+				"key": "ctrl+alt+u",
+				"mac": "cmd+alt+u"
+			},
+			{
+				"command": "interface-builder.insertInterface",
 				"key": "ctrl+alt+i",
 				"mac": "cmd+alt+i"
+			},
+			{
+				"command": "interface-builder.replaceInterface",
+				"key": "ctrl+alt+o",
+				"mac": "cmd+alt+o"
 			}
-		],
-		"configuration": {
-			"title": "Interface builder for Typescript",
-			"properties": {
-				"interface-builder.interfaceName": {
-					"type": "string",
-					"default": "InterfaceBuilder",
-					"description": "Change interface name (Default InterfaceBuilder)"
-				},
-				"interface-builder.destination": {
-					"type": "string",
-					"enum": [
-						"add-above",
-						"replace",
-						"new-file"
-					],
-					"default": "add-above",
-					"description": "Destination option for created interface"
-				}
-			}
-		}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",

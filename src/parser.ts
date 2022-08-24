@@ -1,17 +1,13 @@
-import { Config } from "./config";
-import { FlatModel, Model } from "./interface-builder.types";
+import { FlatModel, Model } from "./extension.type";
 import { TypeChecker } from "./type-checker";
 
 export class Parser {
   private flatModelList: FlatModel[] = [];
 
-  public getFlatModel(stringModel: string): FlatModel[] {
-    const config = new Config();
-    const name = config.getInterfaceName();
+  public getFlatModel(stringModel: string, interfaceName: string): FlatModel[] {
+    const objectModel = { [interfaceName]: this.parseToObjectModel(stringModel) };
+    this.deconstruct(objectModel, interfaceName);
 
-    const objectModel = { [name]: this.parseToObjectModel(stringModel) };
-    this.deconstruct(objectModel, name);
-    
     return this.flatModelList;
   }
 

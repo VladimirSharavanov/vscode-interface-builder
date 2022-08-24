@@ -1,47 +1,94 @@
 import * as vscode from 'vscode';
-import { Config } from './config';
 import { InterfaceBuilder } from './interface-builder';
+import { TextEncoder } from 'util';
+import { Config } from './config';
+import { Notification } from './notification';
+import { NotificationCode } from './extension.type';
 
-/**
- * @param {vscode.ExtensionContext} context
- */
+export class Extension {
+  private config: Config = new Config();
+  private notification: Notification = new Notification();
+  
+  public insertInterface() {
+    return () => {
+      const activeTextEditor = vscode.window.activeTextEditor;
 
-export function activate(context: vscode.ExtensionContext) {
-	const disposable = vscode.commands.registerCommand(
-		'interface-builder.getInterface',
-		() => {
-			const activeTextEditor = vscode.window.activeTextEditor;
-			if (activeTextEditor) {
-				const config = new Config();
-				const selectedText = activeTextEditor.document.getText(activeTextEditor.selection);
-				const location = activeTextEditor.document.positionAt(0);
+      if (activeTextEditor) {
+        const selection = activeTextEditor.selection;
+        const selectedText = activeTextEditor.document.getText(selection);
+        const location = activeTextEditor.document.positionAt(0);
 
+        vscode.window.activeTextEditor?.edit((editBuilder) => {
+          try {
+            const interfaceName = this.config.getInterfaceName();
+            const ib = new InterfaceBuilder();
+            const interfaceTS = ib.getInterface(selectedText, interfaceName);
 
-				vscode.window.activeTextEditor?.edit((editBuilder) => {
-					try {
-						const ib = new InterfaceBuilder();
-						const interfaceTS = ib.getInterface(selectedText);
+            editBuilder.insert(location, interfaceTS);
+          } catch (error) {
+            this.notification.error(NotificationCode.notValidObject);
+          }
+        });
+      }
+    };
+  }
 
-						switch (config.getDestination()) {
-							case 'addabove':
-								editBuilder.insert(location, interfaceTS);
-								break;
-							case 'replace':
-								editBuilder.replace(activeTextEditor.selection, interfaceTS);
-								break;
-							case 'newfile':
-								break;
-							default:
-								break;
-						}
-					} catch (error) {
-						vscode.window.showErrorMessage('Selected text is not a valid object');
-					}
-				});
-			}
-		});
+  public replaceInterface() {
+    return () => {
+      const activeTextEditor = vscode.window.activeTextEditor;
 
-	context.subscriptions.push(disposable);
+      if (activeTextEditor) {
+        const selection = activeTextEditor.selection;
+        const selectedText = activeTextEditor.document.getText(selection);
+
+        vscode.window.activeTextEditor?.edit((editBuilder) => {
+          try {
+            const interfaceName = this.config.getInterfaceName();
+            const ib = new InterfaceBuilder();
+            const interfaceTS = ib.getInterface(selectedText, interfaceName);
+
+            editBuilder.replace(selection, interfaceTS);
+          } catch (error) {
+            this.notification.error(NotificationCode.notValidObject);
+          }
+        });
+      }
+    };
+  }
+
+  public exportInterface() {
+    return () => {
+      const activeTextEditor = vscode.window.activeTextEditor;
+
+      if (activeTextEditor) {
+        const selectedText = activeTextEditor.document.getText(activeTextEditor.selection);
+
+        try {
+          vscode.window.showInputBox({ title: 'Enter valid interface name.', placeHolder: 'Default: InterfaceBuilder' }).then(value => {
+            const interfaceName = this.config.getInterfaceName(value);
+            const ib = new InterfaceBuilder();
+            const interfaceTS = ib.getInterface(selectedText, interfaceName);
+          
+            const uri = activeTextEditor.document.uri;
+            const content = new TextEncoder().encode(interfaceTS);
+            const path = this.config.getUriPath(uri);
+          
+            if (uri.scheme === 'file') {
+              vscode.workspace.fs.writeFile(path, content);
+            } else {
+              vscode.window.showSaveDialog({ defaultUri: uri, title: 'Export interface file name' })
+                .then(uri => {
+                  if (uri) {
+                    const path = this.config.getUriPath(uri);
+                    vscode.workspace.fs.writeFile(path, content);
+                  }
+                });
+            }
+          });
+        } catch (error) {
+          this.notification.error(NotificationCode.notValidObject);
+        }
+      }
+    };
+  }
 }
-
-export function deactivate() { }

@@ -1,10 +1,10 @@
-import { FlatModel } from "./interface-builder.types";
+import { FlatModel } from "./extension.type";
 import { Parser } from "./parser";
 import { TypeChecker } from "./type-checker";
 
 export class InterfaceBuilder {
-  public getInterface(selectedText: string): string {
-    const flatModel = new Parser().getFlatModel(selectedText);
+  public getInterface(selectedText: string, interfaceName: string): string {
+    const flatModel = new Parser().getFlatModel(selectedText, interfaceName);
     const typeModelValue = this.checkTypeModelValue(flatModel);
     const correctModel = this.preparationCorrectModel(typeModelValue);
     const result = this.renderInterface(correctModel);
