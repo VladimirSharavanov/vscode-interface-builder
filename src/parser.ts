@@ -13,7 +13,7 @@ export class Parser {
 
   private deconstruct(model: Model, parentName: string) {
     for (const key in model) {
-      const interfaceName = { name: !isNaN(Number(key)) ? parentName : key };      
+      const interfaceName = { name: !isNaN(Number(key)) ? parentName : key };
       const value = model[key];
       const typeList = ['object', 'object[]'];
 
@@ -38,25 +38,7 @@ export class Parser {
 
   private removeSpaces(stringModel: string): string {
     const spacePattern = /[\s | \n | \t]/g;
-    const commaPattern = /['"`]/g;
-    const commaList: string[] = [];
-
-    let result = '';
-    for (let i = 0; i < stringModel.length; i++) {
-      const char = stringModel[i];
-      const prevChar = stringModel[i - 1];
-      const lastChar = commaList.length - 1;
-      const checkComma = char.match(commaPattern);
-      const space = char.match(spacePattern);
-
-      if (checkComma && prevChar !== '\\') {
-        commaList[lastChar] === char ? commaList.pop() : commaList.push(char);
-      };
-
-      if (!space || commaList.length) {
-        result += char;
-      };
-    };
+    const result = stringModel.replace(spacePattern, '');
 
     return result;
   };
