@@ -1,39 +1,22 @@
-import { FlatModel, Model } from "./extension.type";
-import { TypeChecker } from "./type-checker";
+import { Model } from "./extension.type";
 
 export class Parser {
-  private flatModelList: FlatModel[] = [];
 
-  public getFlatModel(stringModel: string, interfaceName: string): FlatModel[] {
-    const objectModel = { [interfaceName]: this.parseToObjectModel(stringModel) };
-    this.deconstruct(objectModel, interfaceName);
-
-    return this.flatModelList;
+  public toJson(stringModel: string, interfaceName: string): Model {
+    console.log('in: ', stringModel);
+    return this.parseToObjectModel(stringModel, interfaceName);
   }
 
-  private deconstruct(model: Model, parentName: string) {
-    for (const key in model) {
-      const interfaceName = { name: !isNaN(Number(key)) ? parentName : key };
-      const value = model[key];
-      const typeList = ['object', 'object[]'];
-
-      if (typeList.includes(TypeChecker.checkType(value))) {
-        if (!TypeChecker.isArray(value)) {
-          this.flatModelList.push({ ...interfaceName, value });
-        }
-        this.deconstruct(value, key);
-      }
-    }
-  }
-
-  private parseToObjectModel(stringModel: string): Model {
+  private parseToObjectModel(stringModel: string, interfaceName: string): Model {
     stringModel = this.removeSpaces(stringModel);
-    stringModel = this.removeSuperfluousSubstring(stringModel);
-    stringModel = this.removeCommaBeforeBracket(stringModel);
-    stringModel = this.fixesQuotes(stringModel);
-    stringModel = this.keyQuotes(stringModel);
+    // stringModel = this.removeSuperfluousSubstring(stringModel);
+    // stringModel = this.removeCommaBeforeBracket(stringModel);
+    // stringModel = this.fixesQuotes(stringModel);
+    // stringModel = this.keyQuotes(stringModel);
 
-    return JSON.parse(stringModel);
+    console.log('out: ', stringModel);
+
+    return { [interfaceName]: JSON.parse(stringModel)};
   };
 
   private removeSpaces(stringModel: string): string {
@@ -64,51 +47,48 @@ export class Parser {
     return stringModel;
   };
 
-  private fixesQuotes(stringModel: string): string {
-    const singleCommaPattern = /['`]/g;
-    const commaPattern = /["`]/g;
-    const commaList: string[] = [];
+  // private fixesQuotes(stringModel: string): string {
+  //   const quotePattern = /['`"]/g;
+  //   const escapePattern = /\\/;
+  //   const stack: string[] = [];
 
-    while (commaPattern.test(stringModel)) {
-      stringModel = stringModel.replace(commaPattern, '\'');
-    };
+  //   let result = '';
+  //   for (let i = 0; i < stringModel.length; i++) {
+  //     let char = stringModel[i];
+  //     const prevChar = stringModel[i - 1];
+  //     const nextChar = stringModel[i + 1];
+  //     const lastCharInStack = stack.length - 1;
+  //     const emptyStack = stack.length === 0;
+  //     const isQuote = quotePattern.test(char);
+  //     const isEscape = escapePattern.test(prevChar);
 
-    let result = '';
-    for (let i = 0; i < stringModel.length; i++) {
-      let char = stringModel[i];
-      const prevChar = stringModel[i - 1];
-      const nextChar = stringModel[i + 1];
-      const lastChar = commaList.length - 1;
-      const isSingleComma = char.match(singleCommaPattern);
+  //     if (isQuote && !isEscape) {
+  //       if (!emptyStack &&
+  //         prevChar === ':' ||
+  //         prevChar === ',' ||
+  //         nextChar === ':' ||
+  //         nextChar === ',' ||
+  //         nextChar === '}' ||
+  //         prevChar === '[' ||
+  //         nextChar === ']'
+  //       ) {
+  //         char = '"';
+  //       } else {
+  //         stack[lastCharInStack] === char ? stack.pop() : stack.push(char);
+  //         char = '\"';
+  //       };
+  //     }
+      
+  //     result += char;
+  //   };
 
-      if (isSingleComma && prevChar !== '\\') {
-        if (!commaList.length && prevChar === ':'
-          || !commaList.length && prevChar === ','
-          || !commaList.length && nextChar === ':'
-          || !commaList.length && nextChar === ','
-          || !commaList.length && nextChar === '}'
-          || !commaList.length && prevChar === '['
-          || !commaList.length && nextChar === ']'
-        ) {
-          char = '"';
-        } else {
-          commaList[lastChar] === char ? commaList.pop() : commaList.push(char);
-        };
-      };
+  //   return stringModel;
+  // };
 
-      result += char;
-    };
+  // private keyQuotes(stringModel: string): string {
+  //   const keyPattern = /(?<wrap>[{,])(?<q1>['"]?)(?<key>\w+)(?<q2>['"]?)(?<colon>:)/g;
+  //   stringModel = stringModel.replace(keyPattern, '$<wrap>"$<key>"$<colon>');
 
-    return result;
-  };
-
-  private keyQuotes(stringModel: string): string {
-    const keyPattern = /(?<wrap>[{,])(?<q1>[']?)(?<key>\w+)(?<q2>[']?)(?<colon>:)/g;
-
-    while (stringModel.match(keyPattern)) {
-      stringModel = stringModel.replace(keyPattern, '$<wrap>"$<key>"$<colon>');
-    };
-
-    return stringModel;
-  };
+  //   return stringModel;
+  // };
 };
