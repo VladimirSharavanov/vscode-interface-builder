@@ -1,3 +1,5 @@
+import { Parser } from "../parser";
+
 const data: Record<string, string> = {
   t01: `const x = {interface: 'builder', version: 1},`,
   t02: `let x = {interface: 'builder', version: 1,};`,
@@ -130,4 +132,66 @@ const data: Record<string, string> = {
         }
       }
   `,
+  t60: `
+      {
+        user: "interface 'builder'",
+      }
+  `,
+  t61: `
+      {
+        user: "interface ",builder"",
+      }
+  `,
+  t62: `
+      {
+        user: "interface \'builder\'",
+      }
+  `,
+  t63: `
+      {
+        "user": "interface \"builder\"",
+      }
+  `,
+  t64: `
+      {
+        user: 'interface \'builder\'',
+      }
+  `,
+  t65: `
+      {
+        user: "interface 'builder",
+      }
+  `,
+  t66: `
+      {
+        user: "interface \'builder",
+      }
+  `,
+  t67: `
+      {
+        user: "interface \"builder",
+      }
+  `,
+  t68: `
+      {
+        user: 'interface builder\'',
+      }
+  `
+};
+
+function testData() {
+  const p = new Parser();
+  for (const key in data) {
+    try {
+      const result = p.toJson(data[key], 'test');
+    } catch (error) {
+      console.log(`${key}-error: ${error}`);
+    }
+  }
+};
+
+function testItem() {
+  const p = new Parser();
+  const result = p.toJson(data.t68, 'test');
+  console.log(result);
 };

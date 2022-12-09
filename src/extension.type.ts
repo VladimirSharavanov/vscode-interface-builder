@@ -10,3 +10,8 @@ export enum NotificationCode {
   interfaceNameContainSpaces = 'interfaceNameContainSpaces',
   notValidObject = 'notValidObject',
 }
+
+export interface Handler {
+  setNext(handler: Handler): Handler;
+  handle(stringModel: string, interfaceName: string): Model;
+}

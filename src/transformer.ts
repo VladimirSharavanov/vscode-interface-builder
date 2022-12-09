@@ -6,7 +6,6 @@ export class Transformer {
 
   public toFlatModel(model: Model, parentName: string) {
     this.transform(model, parentName);
-    console.log('dec: ', this.flatModels);
     
     return this.flatModels;
   }

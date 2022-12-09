@@ -1,12 +1,11 @@
 import { FlatModel } from "./extension.type";
-import { Parser } from "./parser";
+import { parseToObjectModel } from "./parser";
 import { Transformer } from "./transformer";
 import { TypeChecker } from "./type-checker";
 
 export class InterfaceBuilder {
   public getInterface(selectedText: string, interfaceName: string): string {
-    const parser = new Parser();
-    const model = parser.toJson(selectedText, interfaceName);
+    const model = parseToObjectModel(selectedText, interfaceName);
     const transformer = new Transformer();
     const flatModel = transformer.toFlatModel(model, interfaceName);
 
