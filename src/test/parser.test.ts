@@ -1,4 +1,4 @@
-import { Parser } from "../parser";
+import { parseToObjectModel } from "../parser";
 
 const data: Record<string, string> = {
   t01: `const x = {interface: 'builder', version: 1},`,
@@ -177,21 +177,4 @@ const data: Record<string, string> = {
         user: 'interface builder\'',
       }
   `
-};
-
-function testData() {
-  const p = new Parser();
-  for (const key in data) {
-    try {
-      const result = p.toJson(data[key], 'test');
-    } catch (error) {
-      console.log(`${key}-error: ${error}`);
-    }
-  }
-};
-
-function testItem() {
-  const p = new Parser();
-  const result = p.toJson(data.t68, 'test');
-  console.log(result);
 };
