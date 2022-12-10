@@ -1,10 +1,14 @@
 import { FlatModel } from "./extension.type";
-import { Parser } from "./parser";
+import { parseToObjectModel } from "./parser";
+import { Transformer } from "./transformer";
 import { TypeChecker } from "./type-checker";
 
 export class InterfaceBuilder {
   public getInterface(selectedText: string, interfaceName: string): string {
-    const flatModel = new Parser().getFlatModel(selectedText, interfaceName);
+    const model = parseToObjectModel(selectedText, interfaceName);
+    const transformer = new Transformer();
+    const flatModel = transformer.toFlatModel(model, interfaceName);
+
     const typeModelValue = this.checkTypeModelValue(flatModel);
     const correctModel = this.preparationCorrectModel(typeModelValue);
     const result = this.renderInterface(correctModel);

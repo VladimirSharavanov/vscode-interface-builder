@@ -1,3 +1,6 @@
+# 1.1.1
+* Improve parser
+* Fix escape char error
 # 1.0.0
 * Added replacing selected object by ts interface
 * Added export ts interface to file

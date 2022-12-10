@@ -1,78 +1,60 @@
-import { FlatModel, Model } from "./extension.type";
-import { TypeChecker } from "./type-checker";
+import { Handler, Model } from "./extension.type";
 
-export class Parser {
-  private flatModelList: FlatModel[] = [];
+export abstract class Parser implements Handler {
+  private nextHandler: Handler | null = null;
 
-  public getFlatModel(stringModel: string, interfaceName: string): FlatModel[] {
-    const objectModel = { [interfaceName]: this.parseToObjectModel(stringModel) };
-    this.deconstruct(objectModel, interfaceName);
-
-    return this.flatModelList;
+  public setNext(handler: Handler): Handler {
+    this.nextHandler = handler;
+    return handler;
   }
 
-  private deconstruct(model: Model, parentName: string) {
-    for (const key in model) {
-      const interfaceName = { name: !isNaN(Number(key)) ? parentName : key };      
-      const value = model[key];
-      const typeList = ['object', 'object[]'];
+  public handle(stringModel: string, interfaceName: string): Model {
+    return this.nextHandler ? this.nextHandler.handle(stringModel, interfaceName) : {};
+  }
+}
 
-      if (typeList.includes(TypeChecker.checkType(value))) {
-        if (!TypeChecker.isArray(value)) {
-          this.flatModelList.push({ ...interfaceName, value });
-        }
-        this.deconstruct(value, key);
-      }
+export class JsonHandler extends Parser {
+  public handle(stringModel: string, interfaceName: string): Model {
+    try {
+      return { [interfaceName]: JSON.parse(stringModel) };
+    } catch {
+      return super.handle(stringModel, interfaceName);
     }
   }
+}
 
-  private parseToObjectModel(stringModel: string): Model {
+export class ParserHandler extends Parser {
+  public handle(stringModel: string, interfaceName: string): Model {
+    return this.parse(stringModel, interfaceName);
+  }
+
+  private parse(stringModel: string, interfaceName: string): Model {
     stringModel = this.removeSpaces(stringModel);
     stringModel = this.removeSuperfluousSubstring(stringModel);
     stringModel = this.removeCommaBeforeBracket(stringModel);
-    stringModel = this.fixesQuotes(stringModel);
-    stringModel = this.keyQuotes(stringModel);
+    stringModel = this.addObjectKeyQuotes(stringModel);
+    stringModel = this.addObjectValueQuotes(stringModel);
+    stringModel = this.removeObjectValueString(stringModel);
+    stringModel = this.removeArrayValueString(stringModel);
 
-    return JSON.parse(stringModel);
+    return { [interfaceName]: JSON.parse(stringModel) };
   };
 
   private removeSpaces(stringModel: string): string {
     const spacePattern = /[\s | \n | \t]/g;
-    const commaPattern = /['"`]/g;
-    const commaList: string[] = [];
+    stringModel = stringModel.replace(spacePattern, '');
 
-    let result = '';
-    for (let i = 0; i < stringModel.length; i++) {
-      const char = stringModel[i];
-      const prevChar = stringModel[i - 1];
-      const lastChar = commaList.length - 1;
-      const checkComma = char.match(commaPattern);
-      const space = char.match(spacePattern);
-
-      if (checkComma && prevChar !== '\\') {
-        commaList[lastChar] === char ? commaList.pop() : commaList.push(char);
-      };
-
-      if (!space || commaList.length) {
-        result += char;
-      };
-    };
-
-    return result;
+    return stringModel;
   };
 
   private removeSuperfluousSubstring(stringModel: string): string {
     const preparationPattern = /^[^{:,]+:[^,]+,/g;
     const lineStartPattern = /^[^[{]*(?=[[{])/g;
     const lineEndPattern = /[^\]}]+$/g;
-
     stringModel = stringModel.replace(lineStartPattern, '');
-    if (stringModel.match(preparationPattern)) {
-      stringModel = `{${stringModel}}`;
-    };
-    stringModel = stringModel.replace(lineEndPattern, '');
+    stringModel = preparationPattern.test(stringModel) ? `{${stringModel}}` : stringModel;
 
-    return stringModel;
+    return stringModel.replace(lineEndPattern, '');
   };
 
   private removeCommaBeforeBracket(stringModel: string): string {
@@ -82,51 +64,43 @@ export class Parser {
     return stringModel;
   };
 
-  private fixesQuotes(stringModel: string): string {
-    const singleCommaPattern = /['`]/g;
-    const commaPattern = /["`]/g;
-    const commaList: string[] = [];
-
-    while (commaPattern.test(stringModel)) {
-      stringModel = stringModel.replace(commaPattern, '\'');
-    };
-
-    let result = '';
-    for (let i = 0; i < stringModel.length; i++) {
-      let char = stringModel[i];
-      const prevChar = stringModel[i - 1];
-      const nextChar = stringModel[i + 1];
-      const lastChar = commaList.length - 1;
-      const isSingleComma = char.match(singleCommaPattern);
-
-      if (isSingleComma && prevChar !== '\\') {
-        if (!commaList.length && prevChar === ':'
-          || !commaList.length && prevChar === ','
-          || !commaList.length && nextChar === ':'
-          || !commaList.length && nextChar === ','
-          || !commaList.length && nextChar === '}'
-          || !commaList.length && prevChar === '['
-          || !commaList.length && nextChar === ']'
-        ) {
-          char = '"';
-        } else {
-          commaList[lastChar] === char ? commaList.pop() : commaList.push(char);
-        };
-      };
-
-      result += char;
-    };
-
-    return result;
-  };
-
-  private keyQuotes(stringModel: string): string {
-    const keyPattern = /(?<wrap>[{,])(?<q1>[']?)(?<key>\w+)(?<q2>[']?)(?<colon>:)/g;
-
-    while (stringModel.match(keyPattern)) {
-      stringModel = stringModel.replace(keyPattern, '$<wrap>"$<key>"$<colon>');
-    };
+  private addObjectKeyQuotes(stringModel: string): string {
+    const quotePattern = /['`"]/g;
+    const keyPattern = /(?<wrap>[{,])(?<q1>['"]?)(?<key>\w+)(?<q2>['"]?)(?<colon>:)/g;
+    stringModel = stringModel.replace(quotePattern, "'");
+    stringModel = stringModel.replace(keyPattern, '$<wrap>"$<key>"$<colon>');
 
     return stringModel;
   };
-};
+
+  private addObjectValueQuotes(stringModel: string) {
+    const startValuePattern = /(?<start>[(":)])(?<q>')/g;
+    const endValuePattern = /(?<q>')(?<end>,?["}])/g;
+    stringModel = stringModel.replace(startValuePattern, '$<start>"');
+    stringModel = stringModel.replace(endValuePattern, '"$<end>');
+
+    return stringModel;
+  }
+
+  private removeObjectValueString(stringModel: string): string {
+    const valuePattern = /(?<key>"\w+":)(?<value>".*?")(?<ending>[,}])/g;
+    stringModel = stringModel.replace(valuePattern, '$<key>""$<ending>');
+
+    return stringModel;
+  };
+
+  private removeArrayValueString(stringModel: string): string {
+    const valuePattern = /(?<c>[,\[])?(?<v>'.*?')(?<cc>[,\]])/g;
+    stringModel = stringModel.replace(valuePattern, '$<c>""$<cc>');
+
+    return stringModel;
+  }
+}
+
+const jsonHandler = new JsonHandler();
+const parserHandler = new ParserHandler();
+jsonHandler.setNext(parserHandler);
+
+export function parseToObjectModel(selectedText: string, interfaceName: string) {
+  return jsonHandler.handle(selectedText, interfaceName);
+}

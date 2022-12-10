@@ -4,7 +4,7 @@ export class Notification {
   private messageList: Record<string, string> = {
     interfaceNameInvalid: '[Interface Builder] Interface name is invalid. Replacing by default name',
     interfaceNameContainSpaces: '[Interface Builder] Interface name cannot contain spaces',
-    notValidObject:'[Interface Builder] Selected text is not a valid object',
+    notValidObject:'[Interface Builder] Selected text is not a valid JSON',
   };
 
   public info(code: string,) {
